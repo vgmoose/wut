@@ -5,6 +5,7 @@ CFILES  := $(wildcard *.c)
 SFILES  := $(wildcard *.S)
 OFILES  := $(CFILES:.c=.o) $(SFILES:.S=.o)
 OUTPUT  := libcrt
+CFLAGS  += -O2 -Wall -std=c11
 
 all: $(OUTPUT).a $(OFILES)
 

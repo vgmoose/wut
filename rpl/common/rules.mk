@@ -36,6 +36,7 @@ export DEPSDIR  := $(BUILDDIR)
 CFILES    := $(foreach dir,$(SOURCE),$(notdir $(wildcard $(dir)/*.c)))
 CXXFILES  := $(foreach dir,$(SOURCE),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES    := $(foreach dir,$(SOURCE),$(notdir $(wildcard $(dir)/*.S)))
+DEFFILES    := $(foreach dir,$(SOURCE),$(notdir $(wildcard $(dir)/*.S)))
 
 export OFILES := $(CFILES:.c=.o) \
                  $(CXXFILES:.cpp=.o) \
@@ -59,18 +60,14 @@ else
 DEPENDS := $(OFILES:.o=.d)
 OFILES  := $(filter-out $(ODEPS),$(OFILES))
 
-$(OUTPUT).a: rpl.o $(OFILES)
+all: $(OUTPUT).a
 
-lib.c: exports.h
+exports.S: exports.def
+	@echo "[GEN]  $(notdir $<)"
+	@$(WUT_ROOT)/tools/bin/genrplstub $(CUR_DIR)/../exports.def exports.S
 
-lib.o: lib.c exports.h
+$(OUTPUT).a: exports.S
 	@echo "[CC]  $(notdir $<)"
-	@$(CC) $(EXTRA_OPTIONS) $(RPLCFLAGS) -S $(INCLUDES) $< -o lib.S
-	@$(CC) $(EXTRA_OPTIONS) $(RPLCFLAGS) -c lib.S -o $@
-
-rpl.o: $(ODEPS)
-	@$(LD) $(EXTRA_OPTIONS) $(LDFLAGS) -r $(ODEPS) -o $@
-
--include $(DEPENDS)
+	@$(CC) -nostdlib -T $(CUR_DIR)/../../common/stub.ld -o $@ exports.S
 
 endif

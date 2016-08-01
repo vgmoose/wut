@@ -1,0 +1,10 @@
+:NAME vpad
+
+:TEXT
+
+// vpad/input.h
+VPADInit
+VPADRead
+VPADGetTPCalibratedPoint
+
+:DATA
